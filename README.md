@@ -4,12 +4,12 @@
 [![CodeQL](https://github.com/thewaltero/mythos-router/actions/workflows/github-code-scanning/codeql/badge.svg?branch=main)](https://github.com/thewaltero/mythos-router/actions/workflows/github-code-scanning/codeql)
 [![Node.js](https://img.shields.io/badge/Node.js-22+-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-6.0-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://typescriptlang.org)
-[![Claude](https://img.shields.io/badge/Claude-Opus_4.8-cc785c?style=flat-square)](https://anthropic.com)
+[![Claude](https://img.shields.io/badge/Claude-Opus_5-cc785c?style=flat-square)](https://anthropic.com)
 [![$MYTHOS on Uniswap](https://img.shields.io/badge/%24MYTHOS-on_Uniswap-cc785c?style=flat-square&labelColor=1a1a2e)](https://app.uniswap.org/swap?outputCurrency=0xb942b75a602fa318ac091370d93d9143ba345ba3&chain=base)
 [![GitHub stars](https://img.shields.io/github/stars/thewaltero/mythos-router?style=social)](https://github.com/thewaltero/mythos-router)
 
 
-## Claude Opus 4.8 · Strict Write Discipline · Zero Slop
+## Claude Opus 5 · Strict Write Discipline · Zero Slop
 **A local CLI power tool for verifiable AI-assisted coding.**
 
 
@@ -36,7 +36,7 @@ npx mythos-router chat
 
 **mythos-router** is a local CLI power tool built around **Strict Write Discipline (SWD)**: a verification layer that checks every file operation an AI agent *claims* to perform against the actual filesystem using SHA-256 snapshots. If a claim doesn't match reality, the batch is rolled back so a bad write never half-lands, and successful runs leave a hash-chained, locally tamper-evident receipt.
 
-The key idea is that **the trust boundary is the filesystem, not the model**. That makes SWD model-agnostic: it ships with a built-in Claude Opus 4.8 agent (`mythos chat` / `mythos run`), but the same engine verifies file actions from *any* agent — GPT, DeepSeek, a local model, or your own script — with no Mythos model key, over stdin/JSON, the SDK, or MCP. See [`examples/verified-writes`](examples/verified-writes/) for a runnable "the agent hallucinated a write, SWD caught it" demo.
+The key idea is that **the trust boundary is the filesystem, not the model**. That makes SWD model-agnostic: it ships with a built-in Claude Opus 5 agent (`mythos chat` / `mythos run`), but the same engine verifies file actions from *any* agent — GPT, DeepSeek, a local model, or your own script — with no Mythos model key, over stdin/JSON, the SDK, or MCP. See [`examples/verified-writes`](examples/verified-writes/) for a runnable "the agent hallucinated a write, SWD caught it" demo.
 
 Zero slop. Zero hallucinated state. Every write verified.
 
@@ -55,7 +55,7 @@ Zero slop. Zero hallucinated state. Every write verified.
 |  **Verified Skill Packs** | Load project-local or user-global `SKILL.md` rules with `-s <name>`; active skills are recorded in SWD receipts |
 |  **Self-Improving Skills** | `mythos skills suggest` mines past SWD receipts for file actions that keep failing verification and proposes `SKILL.md` rules to prevent them; read-only by default, `--write` to persist |
 |  **Deterministic Caching** | SQLite-backed caching for reasoning (SDK only) *(Node 22+)* |
-|  **Adaptive Thinking** | Opus 4.8 with configurable effort levels (high/medium/low) |
+|  **Adaptive Thinking** | Claude Opus 5 with configurable effort levels (high/medium/low) |
 |  **Strict Write Discipline** | Pre/post filesystem snapshots verify every model or external-agent file claim. Works over text `FILE_ACTION` blocks by default, or native provider tool-calling with `--tools` (Anthropic/OpenAI) — same verification either way, auto-falls back to text |
 |  **Isolated Runs** | `swd apply --check <cmd>` / `--run-checks` test a batch in a throwaway copy and apply it to the real tree only if checks pass — the real tree is never left broken |
 |  **SWD Receipts** | Per-run trust receipts record touched files, hashes, provider/external-agent id, budget, git state, and verification result. Receipts are **hash-chained** and serialized under a repository lock. Atomic receipt/HEAD writes detect local gaps, reordering, forks, partial edits, and unsynchronized writers; the local chain is tamper-evident, not an external authenticity proof |
@@ -85,8 +85,8 @@ Choose the right model for the job via the `--effort` flag:
 
 | Effort | Model | Best For |
 |--------|-------|----------|
-|  `high` (default) | Claude Opus 4.8 | Architecture, deep reasoning, complex refactors |
-|  `medium` | Claude Sonnet 4.6 | Balanced code generation, everyday tasks |
+|  `high` (default) | Claude Opus 5 | Architecture, deep reasoning, complex refactors |
+|  `medium` | Claude Sonnet 5 | Balanced code generation, everyday tasks |
 |  `low` | Claude Haiku 4.5 | Quick answers, memory compression, verification |
 
 The `dream` command automatically uses `low` effort (Haiku 4.5) for cost-efficient memory compression, and `verify` uses lightweight scanning — so you only burn Opus tokens when you need deep reasoning.
@@ -216,7 +216,7 @@ mythos run "refactor provider scoring" --branch provider-score
 ### `mythos chat` — Interactive Session
 
 ```bash
-mythos chat                  # Full power (high effort, Opus 4.8)
+mythos chat                  # Full power (high effort, Opus 5)
 mythos chat -s repo          # Load a project-local skill pack
 mythos chat --test-cmd "npm test" # Enable autonomous test-driven self-healing
 mythos chat --provider openai # Force a configured BYOK provider
@@ -633,7 +633,7 @@ mythos-router/
 User Input
     │
     ▼
-[Claude Opus 4.8] ── adaptive thinking
+[Claude Opus 5] ── adaptive thinking
     │
     ▼
 [Parse FILE_ACTION blocks] ── extract claimed operations
