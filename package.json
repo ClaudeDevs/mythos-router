@@ -1,7 +1,7 @@
 {
   "name": "mythos-router",
   "version": "1.23.0",
-  "description": "Capybara-tier CLI router \u2014 Claude Opus 4.8 with Adaptive Thinking, Strict Write Discipline, and Self-Healing Memory",
+  "description": "Capybara-tier CLI router — Claude Opus 5 / Fable 5 with Adaptive Thinking, Strict Write Discipline, and Self-Healing Memory",
   "type": "module",
   "bin": {
     "mythos": "dist/cli.js",

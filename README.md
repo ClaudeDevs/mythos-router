@@ -89,7 +89,7 @@ Choose the right model for the job via the `--effort` flag:
 |  `medium` | Claude Sonnet 5 | Balanced code generation, everyday tasks |
 |  `low` | Claude Haiku 4.5 | Quick answers, memory compression, verification |
 
-The `dream` command automatically uses `low` effort (Haiku 4.5) for cost-efficient memory compression, and `verify` uses lightweight scanning — so you only burn Opus tokens when you need deep reasoning.
+The `dream` command automatically uses `low` effort (Haiku 4.5) for cost-efficient memory compression, and `verify` uses lightweight scanning — so you only burn Opus/Fable tokens when you need deep reasoning.
 
 ### 2. Authority-Based "Self-Healing" Memory
 Most agentic systems stored state in opaque databases or messy JSON files. Mythos Router treats `MEMORY.md` as the **Sole Authority**. 
@@ -675,8 +675,8 @@ The text protocol remains the compatibility fallback if a selected model ignores
 | `ANTHROPIC_API_KEY` | Optional* | Anthropic/Claude key; recommended default provider for `chat`/`run` |
 | `OPENAI_API_KEY` | Optional* | OpenAI API key; can be used as the only configured provider or fallback |
 | `DEEPSEEK_API_KEY` | Optional* | DeepSeek API key; can be used as the only configured provider or fallback |
-| `SURPLUS_API_KEY` | Optional* | [Surplus](https://www.surplusintelligence.ai) marketplace key (`inf_...`); OpenAI-compatible, routes the same models at a discount. Defaults to `claude-opus-4.8`. |
-| `MYTHOS_SURPLUS_MODEL` | Optional | Override the Surplus model id (default `claude-opus-4.8`) |
+| `SURPLUS_API_KEY` | Optional* | [Surplus](https://www.surplusintelligence.ai) marketplace key (`inf_...`); OpenAI-compatible, routes the same models at a discount. Defaults to `claude-opus-5`. |
+| `MYTHOS_SURPLUS_MODEL` | Optional | Override the Surplus model id (default `claude-opus-5`) |
 | `MYTHOS_SURPLUS_BASE_URL` | Optional | Override the Surplus endpoint (default `https://www.surplusintelligence.ai/api/inference/v1`) |
 
 \* `mythos chat` and `mythos run` need at least one model provider key. `mythos swd apply` needs no model key because an external agent brings its own model/key and Mythos only verifies file actions.
@@ -703,34 +703,20 @@ The text protocol remains the compatibility fallback if a selected model ignores
 
 ## Token Usage & Budget
 
-### Opus 4.8 Pricing (as of 2026-05)
+### Claude model pricing (API, as of 2026-08)
 
-| Rate | USD |
-|------|-----|
-| Input tokens | $5.00 / 1M tokens |
-| Output tokens | $25.00 / 1M tokens |
+| Model | API ID | Input / 1M | Output / 1M | Role in Mythos |
+| --- | --- | --- | --- | --- |
+| **Claude Fable 5** | `claude-fable-5` | $10.00 | $50.00 | Optional max (`MYTHOS_ANTHROPIC_MODEL_HIGH=claude-fable-5`) |
+| **Claude Opus 5** | `claude-opus-5` | $5.00 | $25.00 | Default `--effort high` |
+| **Claude Sonnet 5** | `claude-sonnet-5` | $2.00 | $10.00 | Default `--effort medium` |
+| **Claude Haiku 4.5** | `claude-haiku-4-5-20251001` | $1.00 | $5.00 | Default `--effort low` / `dream` |
 
-> **Tokenizer note**
-> Opus 4.8 keeps the same rate card *and* the same tokenizer as Opus 4.7 — upgrading from 4.7 does not change your effective token counts or your bill.
-> The tokenizer change happened earlier, at the 4.6 → 4.7 boundary, where Latin-script text became somewhat less token-efficient. If you pin an older model (e.g. `MYTHOS_ANTHROPIC_MODEL_HIGH=claude-opus-4-6`) and later move up, expect a modest increase in effective tokens on English-heavy input. Actual impact depends entirely on your content — rely on your provider's billing dashboard for exact figures.
+Prior Opus IDs (`claude-opus-4-8`, etc.) remain in the pricing registry if you pin them via env.
 
-> **Note on token accounting:** Mythos reports the **real token usage returned by the provider API** whenever it is available. When a provider does not return usage (e.g. some streaming responses), Mythos falls back to a rough `characters / 4` estimate purely to drive the in-session budget bar — it is a guardrail, not an exact tokenizer. Treat the displayed cost figures as estimates and rely on your provider's billing dashboard for exact charges.
-
-> Pricing constants live in `src/config.ts`. When Anthropic updates rates, change two lines — no budget math to refactor.
-
-| Mode | Typical Cost Per Turn |
-|------|----------------------|
-| `--effort high` | Full Opus 4.8 pricing (deep reasoning) |
-| `--effort medium` | Balanced — good for most tasks |
-| `--effort low` | Minimal thinking — quick answers |
-| `dream` | Low effort summarization (~500 tokens) |
-
-| Budget Setting | Default |
-|---------------|---------|
-| `--max-tokens` | 500,000 per session |
-| `--max-turns` | 25 per session |
-| Warning threshold | 80% consumption |
-| `--no-budget` | Disables all limits |
+> **Defaults:** Mythos maps `high` → Opus 5, `medium` → Sonnet 5, `low` → Haiku 4.5.
+> For the hardest long-horizon work, set `MYTHOS_ANTHROPIC_MODEL_HIGH=claude-fable-5`.
+> Budget estimates use the model ID returned by the provider; unknown IDs fall back to Opus-class rates.
 
 ### Graceful Save
 
