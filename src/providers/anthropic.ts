@@ -107,6 +107,8 @@ export class AnthropicProvider implements BaseProvider {
   }
 
   // ── Extended-thinking budget from effort level ───────────
+  // Opus / Sonnet / Fable / Mythos support extended thinking.
+  // Fable 5 keeps thinking on by default; do not send thinking:{type:'disabled'}.
   // The real Anthropic Messages API expects
   //   thinking: { type: 'enabled', budget_tokens: N }
   // where budget_tokens is >= 1024 and STRICTLY less than max_tokens
@@ -146,7 +148,7 @@ export class AnthropicProvider implements BaseProvider {
 
     let stream;
     try {
-      const supportsThinking = model.includes('opus') || model.includes('sonnet');
+      const supportsThinking = /opus|sonnet|fable|mythos/i.test(model);
       const thinking = supportsThinking ? this.resolveThinking(effort, maxTokens) : undefined;
       stream = await this.client.messages.stream({
         model,
@@ -260,7 +262,7 @@ export class AnthropicProvider implements BaseProvider {
 
     let response;
     try {
-      const supportsThinking = model.includes('opus') || model.includes('sonnet');
+      const supportsThinking = /opus|sonnet|fable|mythos/i.test(model);
       const thinking = supportsThinking ? this.resolveThinking(effort, maxTokens) : undefined;
       response = await this.client.messages.create({
         model,

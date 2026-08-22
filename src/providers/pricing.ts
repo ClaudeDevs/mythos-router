@@ -18,13 +18,27 @@ interface ModelPricing {
 }
 
 const PRICING_TABLE: Record<string, ModelPricing> = {
-  // ── Anthropic ────────────────────────────────────────────
+  // ── Anthropic (current ladder, Aug 2026) ───────────────────
+  // Fable 5 — highest widely available (Mythos-class)
+  'claude-fable-5':       { inputPer1M: 10.00,  outputPer1M: 50.00 },
+  'claude-mythos-5':      { inputPer1M: 10.00,  outputPer1M: 50.00 }, // Glasswing-only; same rates
+
+  // Opus 5 — near-frontier coding default ($5/$25)
+  'claude-opus-5':        { inputPer1M: 5.00,   outputPer1M: 25.00 },
+
+  // Prior Opus generation (still valid if pinned via env)
   'claude-opus-4-8':      { inputPer1M: 5.00,   outputPer1M: 25.00 },
   'claude-opus-4-7':      { inputPer1M: 5.00,   outputPer1M: 25.00 },
   'claude-opus-4-6':      { inputPer1M: 5.00,   outputPer1M: 25.00 },
+
+  // Sonnet
+  'claude-sonnet-5':      { inputPer1M: 2.00,   outputPer1M: 10.00 },
   'claude-sonnet-4-6':    { inputPer1M: 3.00,   outputPer1M: 15.00 },
   'claude-sonnet-3-5':    { inputPer1M: 3.00,   outputPer1M: 15.00 },
+
+  // Haiku
   'claude-haiku-4-5-20251001': { inputPer1M: 1.00,   outputPer1M: 5.00 },
+  'claude-haiku-4-5':     { inputPer1M: 1.00,   outputPer1M: 5.00 },
   'claude-haiku-3':       { inputPer1M: 0.25,   outputPer1M: 1.25 },
 
   // ── OpenAI ───────────────────────────────────────────────
@@ -39,7 +53,7 @@ const PRICING_TABLE: Record<string, ModelPricing> = {
   'deepseek-reasoner':    { inputPer1M: 0.55,   outputPer1M: 2.19 },
 };
 
-// Fallback pricing for unknown models (conservative estimate)
+// Fallback pricing for unknown models (conservative Opus-class estimate)
 const FALLBACK_PRICING: ModelPricing = { inputPer1M: 5.00, outputPer1M: 20.00 };
 
 // ── Per-Provider Price Adjustment ────────────────────────────

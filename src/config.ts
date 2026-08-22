@@ -3,12 +3,24 @@
 //  Constants, system prompt, validation, and provider config
 // ─────────────────────────────────────────────────────────────
 
-// Anthropic model tiers. Defaults can be overridden per-tier via env vars,
-// mirroring MYTHOS_OPENAI_MODEL / MYTHOS_DEEPSEEK_MODEL. This lets users pin an
-// older version (e.g. MYTHOS_ANTHROPIC_MODEL_HIGH=claude-opus-4-7) without code changes.
+// Anthropic model tiers (Aug 2026 ladder).
+// Defaults:
+//   high   → Claude Opus 5   (near-frontier coding, $5/$25) — recommended default
+//   medium → Claude Sonnet 5 (everyday balance)
+//   low    → Claude Haiku 4.5 (fast / cheap / dream)
+//
+// Override any tier without a code change:
+//   MYTHOS_ANTHROPIC_MODEL_HIGH=claude-fable-5     # max capability ($10/$50)
+//   MYTHOS_ANTHROPIC_MODEL_HIGH=claude-opus-4-8    # pin previous generation
+//   MYTHOS_ANTHROPIC_MODEL_MEDIUM=claude-sonnet-5
+//   MYTHOS_ANTHROPIC_MODEL_LOW=claude-haiku-4-5-20251001
+//
+// Fable 5 (`claude-fable-5`) is Anthropic's highest widely available model
+// (Mythos-class). Prefer it for the hardest long-horizon work; keep Opus 5 as
+// the default high tier for cost/performance on typical coding agents.
 export const MODELS: Record<string, string> = {
-  high: process.env.MYTHOS_ANTHROPIC_MODEL_HIGH?.trim() || 'claude-opus-4-8',
-  medium: process.env.MYTHOS_ANTHROPIC_MODEL_MEDIUM?.trim() || 'claude-sonnet-4-6',
+  high: process.env.MYTHOS_ANTHROPIC_MODEL_HIGH?.trim() || 'claude-opus-5',
+  medium: process.env.MYTHOS_ANTHROPIC_MODEL_MEDIUM?.trim() || 'claude-sonnet-5',
   low: process.env.MYTHOS_ANTHROPIC_MODEL_LOW?.trim() || 'claude-haiku-4-5-20251001',
 };
 
@@ -30,12 +42,12 @@ export const BUDGET_WARN_PERCENT = 80;
 export const MAX_OUTPUT_TOKENS_STREAM = 16384;
 export const MAX_OUTPUT_TOKENS_SEND = 8192;
 
-// ── Anthropic Pricing (USD per token) ────────────────────────
-// Claude Opus 4.8 pricing as of 2026-05. Verified unchanged from Opus 4.7:
-// $5.00 / 1M input, $25.00 / 1M output. Update these when Anthropic changes rates.
-// Note: when the provider API does not return token usage, budget/cost figures
-// fall back to a rough characters/4 estimate — a guardrail, not exact billing.
-// Source: https://www.anthropic.com/claude/opus
+// ── Anthropic fallback pricing (USD per token) ───────────────
+// Used only when the provider does not return usage, or for legacy budget
+// estimates. Prefer providers/pricing.ts (model-id aware) for real costs.
+// Opus 5 / Opus 4.8 class: $5.00 / 1M input, $25.00 / 1M output.
+// Fable 5 is $10 / $50 — set MYTHOS_ANTHROPIC_MODEL_HIGH=claude-fable-5 if used.
+// Source: https://docs.anthropic.com/en/docs/about-claude/pricing
 export const COST_PER_INPUT_TOKEN = 5 / 1_000_000; // $5.00 / 1M input tokens
 export const COST_PER_OUTPUT_TOKEN = 25 / 1_000_000; // $25.00 / 1M output tokens
 
@@ -55,7 +67,7 @@ export const DEFAULT_IGNORE_PATTERNS = Object.freeze([
 export const CAPYBARA_SYSTEM_PROMPT = `\
 ## IDENTITY
 Tier: Capybara (Mythos Router — Specialized in Cybersecurity & PhD Reasoning)
-Model: Claude Opus 4.8 | Protocol: Strict Write Discipline
+Model: Claude (effort-routed) | Protocol: Strict Write Discipline
 Session: mythos-router local power tool
 
 ## CORE DIRECTIVES
@@ -123,7 +135,7 @@ export function getEffort(flag?: string): EffortLevel {
       `\x1b[93m⚠ Unknown effort level "${flag}". Valid: high, medium, low. Defaulting to high.\x1b[0m`,
     );
   }
-  return 'high'; // default: full capybara mode
+  return 'high'; // default: full power (Opus 5 unless overridden)
 }
 
 // ── Validation ───────────────────────────────────────────────
